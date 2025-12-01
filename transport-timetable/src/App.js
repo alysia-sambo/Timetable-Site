@@ -3,29 +3,41 @@ import axios from 'axios';
 
 
 function App() {
-  const [tasks, setTasks] = useState([]);
+  const [trips, setTrips] = useState([]);
   useEffect(() => {
-    axios.get('http://127.0.0.1:8000/api/stops/')
+    axios.get('http://127.0.0.1:8000/api/departing/')
       .then(response => {
-        setTasks(response.data);
+        setTrips(response.data);
       })
       .catch(error => {
-        console.error("There was an error fetching the stops!", error);
+        console.error("There was an error fetching the departing trips!", error);
       });
   }, []);
   return (
     <div className="App">
-      <h1>Stop List</h1>
-      <ul>
-        {tasks.map(stop => (
-          <li key={stop.id}>
-            <h3>{stop.name}</h3>
-            <p>{stop.description}</p>
-            <p>Stop Code: {stop.code}</p>
-            <p>Transport Type: {stop.type}</p>
-          </li>
-        ))}
-      </ul>
+      <h1>Upcoming Departures</h1>
+
+      {Object.entries(trips).map(([stopId, stopData]) => (
+        <div key={stopId}>
+          <h2>{stopData.stop_name} ({stopId})</h2>
+
+          {stopData.trips.length === 0 ? (
+            <p>No upcoming departures</p>
+          ) : (
+            <ul>
+              {stopData.trips.map((trip, i) => (
+                <li key={i}>
+                  <strong>{trip.route}</strong>  
+                  &nbsp;at&nbsp; 
+                  {trip.time}
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <hr />
+        </div>
+      ))}
     </div>
   );
 }
